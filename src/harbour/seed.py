@@ -87,12 +87,19 @@ def seed_database(conn: sqlite3.Connection, *, seed: int = DEFAULT_SEED, n_custo
                     now,
                 ),
             )
-            # Opening disbursement funds the loan; every later balance
-            # change is a real transactions row, never a direct edit.
+            # Sign convention (applies to every tool that writes a
+            # transactions row, not just seeding): amount_cents is signed
+            # from "amount currently owed by the customer". Disbursement
+            # increases what's owed (positive); a payment decreases it
+            # (negative). balance_cents = SUM(amount_cents) is then
+            # directly "amount owed", which is what calculate_payoff and
+            # the refund/fee tools assume. Opening disbursement funds the
+            # loan; every later balance change is a real transactions
+            # row, never a direct edit.
             conn.execute(
                 "INSERT INTO transactions (transaction_id, loan_id, case_id, type, amount_cents, created_at) "
                 "VALUES (?, ?, 'SEED', 'disbursement', ?, ?)",
-                (f"TXN-{rng.randint(1000000,9999999)}", loan_id, -principal, now),
+                (f"TXN-{rng.randint(1000000,9999999)}", loan_id, principal, now),
             )
             # A couple of normal payments so balances aren't all at
             # principal, which would make every case look artificially
@@ -102,7 +109,7 @@ def seed_database(conn: sqlite3.Connection, *, seed: int = DEFAULT_SEED, n_custo
                 conn.execute(
                     "INSERT INTO transactions (transaction_id, loan_id, case_id, type, amount_cents, created_at) "
                     "VALUES (?, ?, 'SEED', 'payment', ?, ?)",
-                    (f"TXN-{rng.randint(1000000,9999999)}", loan_id, payment, now),
+                    (f"TXN-{rng.randint(1000000,9999999)}", loan_id, -payment, now),
                 )
 
 
@@ -135,7 +142,7 @@ def seed_customer_with_injection_note(conn: sqlite3.Connection, *, seed: int = D
     )
     conn.execute(
         "INSERT INTO transactions (transaction_id, loan_id, case_id, type, amount_cents, created_at) "
-        "VALUES (?, ?, 'SEED', 'disbursement', -1000000, ?)",
+        "VALUES (?, ?, 'SEED', 'disbursement', 1000000, ?)",
         (f"TXN-{rng.randint(1000000,9999999)}", loan_id, now),
     )
     return customer_id, loan_id
