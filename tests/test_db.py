@@ -12,6 +12,18 @@ from harbour import models
 from harbour import seed as seed_module
 
 
+def test_init_db_creates_missing_parent_directory(tmp_path):
+    """Regression test for a real bug caught by running the eval runner
+    for the first time: connect() failed with 'unable to open database
+    file' when the target directory didn't exist yet, which is the
+    normal case for a fresh .eval_tmp/ or results/ directory."""
+    nested_path = tmp_path / "does" / "not" / "exist" / "yet.sqlite"
+    assert not nested_path.parent.exists()
+    conn = db_module.init_db(nested_path, fresh=True)
+    conn.close()
+    assert nested_path.exists()
+
+
 def test_schema_creates_all_tables(fresh_db: sqlite3.Connection):
     tables = {
         row["name"]
