@@ -1,4 +1,4 @@
-.PHONY: test cases eval
+.PHONY: test cases eval gateway-eval
 
 test:
 	python -m pytest tests/ -q
@@ -8,3 +8,6 @@ cases:
 
 eval: cases
 	python eval/runner.py
+
+gateway-eval: cases
+	python eval/gateway_regression_runner.py
