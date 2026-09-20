@@ -88,6 +88,15 @@ CREATE TABLE IF NOT EXISTS cases (
     customer_id     TEXT,
     loan_id         TEXT,
     customer_message TEXT NOT NULL,
+    -- Identity credentials the customer supplied at intake, through a
+    -- structured field (an authenticated channel or an IVR/web-form
+    -- prompt) -- separate from the free-text message. This is what
+    -- verify_identity checks against the record on file; it is *not*
+    -- parsed out of customer_message, which stays untrusted free text
+    -- end to end. Nullable: many cases (balance inquiries, payoff
+    -- quotes) never need this.
+    claimed_last4   TEXT,
+    claimed_dob     TEXT,
     status          TEXT NOT NULL DEFAULT 'received' CHECK (status IN
                         ('received','in_progress','resolved','escalated','refused')),
     goal_state_json TEXT,
