@@ -1,4 +1,4 @@
-.PHONY: test cases eval gateway-eval detect
+.PHONY: test cases eval gateway-eval detect reproduce
 
 test:
 	python -m pytest tests/ -q
@@ -14,3 +14,6 @@ gateway-eval: cases
 
 detect: cases
 	python detectors/run_detectors.py
+
+reproduce:
+	bash scripts/reproduce.sh

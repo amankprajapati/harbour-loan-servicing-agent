@@ -10,3 +10,6 @@ results/
 !seed_fixtures/*.sqlite
 traces/
 .DS_Store
+.eval_tmp/
+.eval_tmp_gateway/
+.reproduce_run/
