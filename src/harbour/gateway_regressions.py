@@ -1,16 +1,16 @@
-"""Gateway regression pack (Phase 9).
+"""Gateway regression pack.
 
-The brief describes four faults a model gateway can introduce with no
-change to this repo at all: a stripped system prompt, truncated
-completions, scrambled tool arguments, and an unapproved model
-identity rolled in behind the scenes. There is no real gateway in this
-environment (see llm_client.py's module docstring for why), so each
-regression here is an `LLMClient` wrapper that sits exactly where a
-proxy would sit: between `agent.handle_case` and the client it calls.
-Each one corrupts a real `ScriptedPlannerClient` response the same way
-the described gateway fault would corrupt a real model's response, so
-the question these answer is real: does anything *downstream* of the
-model call actually catch this, or would it slip through unnoticed?
+Four faults a real model gateway can introduce with no change to this
+repo at all: a stripped system prompt, truncated completions, scrambled
+tool arguments, and an unapproved model identity rolled in behind the
+scenes. There is no live gateway in this environment (see
+llm_client.py's module docstring for why), so each regression here is
+an `LLMClient` wrapper that sits exactly where a proxy would sit:
+between `agent.handle_case` and the client it calls. Each one corrupts
+a real `ScriptedPlannerClient` response the same way the described
+gateway fault would corrupt a real model's response, so the question
+these answer is real: does anything *downstream* of the model call
+actually catch this, or would it slip through unnoticed?
 
 Every wrapper is exercised two ways:
 - tests/test_gateway_regressions.py runs each one through the real
@@ -165,11 +165,11 @@ class ScrambledArgsClient:
 class UnapprovedModelIdentityClient:
     """Simulates a gateway that has quietly rolled the model snapshot
     behind the pinned identity -- the response is otherwise completely
-    normal, only `model_id` is wrong. This is the regression symptom 2
-    in the brief describes directly ("answers changed when a model
-    snapshot rolled with no repo change"); `PinnedModelClient` is the
-    fix, and this client exists to drive that fix end to end through the
-    real agent loop rather than only unit-testing it in isolation.
+    normal, only `model_id` is wrong. This is design goal 2 in PLAN.md,
+    directly ("answers changed when a model snapshot rolled with no
+    repo change"); `PinnedModelClient` is the fix, and this client
+    exists to drive that fix end to end through the real agent loop
+    rather than only unit-testing it in isolation.
     """
 
     def __init__(self, inner: LLMClient | None = None, rogue_model_id: str = "unapproved-shadow-snapshot-2027-01-01"):

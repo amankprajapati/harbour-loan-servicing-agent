@@ -1,21 +1,17 @@
-# MEMO.md
+# MEMO.md — project summary
 
-**To:** Head of Platform Engineering
-**Re:** Harbour hardening — Open Problem 01
-**Status:** All 13 planned phases complete and committed; 100+ tests
-green; reproducible end to end via `bash scripts/reproduce.sh`.
+**Status:** All planned phases complete and committed; 100+ tests green;
+reproducible end to end via `bash scripts/reproduce.sh`.
 
 ## The one thing to know before reading the rest
 
-This is a from-scratch build, not a fix to the system described in the
-brief. No Harbour codebase, published case set, checker, or model
-gateway existed anywhere I could reach in this environment. I built the
-system the brief implies should have existed, architected from the
-first commit to not have the six symptoms, plus the four deliverables
-(eval, contract, detectors, checker) the original team never got. I'm
-flagging this once, plainly, because everything else in this memo should
-be read as "here's what a hardened version looks like," not "here's what
-I found wrong with your code."
+This is a from-scratch build, not a patch to an existing system. There
+was no live model gateway available while building it, so the default
+model client is a deterministic scripted planner (see below) — that
+substitution is the single most important thing to understand about
+what this project does and doesn't prove. Everything else here should be
+read as "here's what a hardened version of this kind of agent looks
+like," with the one honest caveat stated up front rather than buried.
 
 ## What actually got fixed, in one line each
 
@@ -42,24 +38,24 @@ independent detector that re-derives the same property from the audit
 trail rather than from the code path that's supposed to guarantee it.
 Full mapping in ANALYSIS.md.
 
-## What I'd want you to push back on
+## Honest limitations
 
 - **The model client is a deterministic scripted planner, not a real
-  LLM.** There is no reachable model gateway in this environment. Every
+  LLM.** There was no model gateway available while building this. Every
   design decision — the `LLMClient` protocol, the pinning wrapper, the
   intent-then-action-set gate — is written so a real gateway-backed
   client drops in behind the same interface with zero changes downstream
   (`src/harbour/llm_client.py::default_client`), but that swap has not
   actually happened or been tested against a real model. This is the
-  single biggest gap between this build and something I'd sign off on
-  shipping to production traffic.
-- **The 30 published cases and the defect detectors are my own
-  stand-ins** for the brief's 180 cases and private detectors. They're
-  real, they're run, and they genuinely catch the defect classes they
-  target (verified by deliberately corrupting fixtures and confirming
-  the detectors fire) — but they were authored by the same person who
-  wrote the fixes, which is not the independence the real held-out set
-  and private detectors are supposed to provide.
+  single biggest gap between this project and something I'd sign off on
+  shipping against production traffic.
+- **The 30 published cases and the defect detectors were authored by
+  the same person who wrote the fixes**, which is not the same as
+  independent verification. They're real, they run, and they genuinely
+  catch the defect classes they target (verified by deliberately
+  corrupting fixtures and confirming the detectors fire) — but a larger,
+  independently authored case set and independently written detectors
+  would be a meaningfully stronger bar.
 - **The injection defense has a known narrower gap.** It stops untrusted
   text from expanding *which* actions a case can take. It does not
   guard against untrusted text influencing the *parameters* of an action

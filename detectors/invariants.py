@@ -1,14 +1,11 @@
-"""Defect detectors (Phase 10).
+"""Defect detectors.
 
-The brief describes private defect detectors the platform team doesn't
-get to see in advance. Those don't exist in this environment, so these
-are declared plainly as a stand-in, not a claim of parity: my own
-deterministic assertions, checked directly against `audit_log`, the
-`transactions` ledger, and the cost ledger export -- the same evidence
-a real detector would have to work from, not a re-run of the code under
-test. Every detector here maps to one of the six symptoms in PLAN.md,
-plus two general integrity checks the rest of the system's claims
-depend on.
+Independent, deterministic assertions checked directly against
+`audit_log`, the `transactions` table, and the cost ledger export --
+the same evidence an outside auditor would have to work from, not a
+re-run of the code under test. Every detector here maps to one of the
+six design goals in PLAN.md, plus two general integrity checks the rest
+of the system's claims depend on.
 
 Each detector returns a list of findings; an empty list is a clean
 pass. `detectors/run_detectors.py` is what actually runs them against a

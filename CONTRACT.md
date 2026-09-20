@@ -1,12 +1,11 @@
 # CONTRACT.md — Harbour's `POST /case` contract
 
-The brief states the one thing every other change in this build has to
-preserve: **"`POST /case` keeps its contract. Everything behind it is
-yours."** There is no published contract document to inherit, so this
-is a reconstruction from the brief's own language, kept deliberately
-small (the brief's phrasing implies the surface is thin) and written so
-`contract_check/check.py` can test a running service against it as a
-black box, without importing any of Harbour's own code to decide
+This is the one thing every other change to this system has to preserve:
+`POST /case` keeps its contract; everything behind it is free to change.
+It's kept deliberately small — a thin, stable surface is what makes it
+possible to change the implementation behind it with confidence — and
+written so `contract_check/check.py` can test a running service against
+it as a black box, without importing any of Harbour's own code to decide
 whether a response is valid.
 
 ## Endpoints

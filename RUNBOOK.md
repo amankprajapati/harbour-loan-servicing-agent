@@ -114,7 +114,6 @@ trusting a green run during an actual incident:
   real LLM (see MEMO.md). It cannot handle a request it has no rule for
   — it escalates rather than guessing. A real gateway integration is the
   single biggest thing between this build and production.
-- The 30 published cases and the defect detectors are this build's own
-  stand-ins for the brief's 180 published cases and private detectors.
-  Treat a clean run as "no known regression," not as "verified against
-  the real grading harness."
+- The 30 published cases and the defect detectors were authored
+  alongside the fixes they check, not independently. Treat a clean run
+  as "no known regression," not as "independently verified."

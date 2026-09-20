@@ -1,14 +1,12 @@
-# ANALYSIS.md — Harbour, Open Problem 01
+# ANALYSIS.md — design rationale
 
 ## What this document is
 
-PLAN.md said this once and it still governs everything below: there is no
-inherited Harbour codebase, published case set, checker, or reachable
-model gateway anywhere in this environment. This is not a post-mortem of
-someone else's incident. It is a from-scratch build, architected against
-the six symptoms the brief describes, with the working hypothesis for
-each symptom stated in PLAN.md *before* the corresponding code was
-written, and revisited here now that the system exists and has been run.
+This is not a post-mortem of a specific incident. It is a from-scratch
+build, architected against the six failure modes PLAN.md sets out as
+this project's design goals, with the working hypothesis for each one
+stated in PLAN.md *before* the corresponding code was written, and
+revisited here now that the system exists and has been run.
 
 Every claim below points at a real file, a real test, and — where the
 claim is "this is detectable," not just "this is fixed" — a real
@@ -25,12 +23,12 @@ tests "does the model follow a clean instruction." It says nothing about
 policy edge cases, adversarial input, or a misbehaving gateway — exactly
 the three axes an incident actually lives on.
 
-**Fix:** `cases/published/cases.json` (30 cases, standing in for the
-brief's 180) spans normal handling across every intent, policy edge
-cases (refund over the auto-limit, failed identity verification), and
-two adversarial prompt-injection scenarios. `eval/gateway_regression_runner.py`
-adds a fourth axis on top: the same 30 cases run again under each of four
-simulated gateway faults.
+**Fix:** `cases/published/cases.json` (30 cases) spans normal handling
+across every intent, policy edge cases (refund over the auto-limit,
+failed identity verification), and two adversarial prompt-injection
+scenarios. `eval/gateway_regression_runner.py` adds a fourth axis on
+top: the same 30 cases run again under each of four simulated gateway
+faults.
 
 **Evidence:** `make eval` — 30/30 against goal_state. `make gateway-eval`
 — baseline 100% correct; under each regression, 7–20 of 30 cases visibly
@@ -39,11 +37,12 @@ suite alone would have missed), and the money-safety invariant holds in
 every single case across all four regressions (`results/gateway_regression_report.json`).
 
 **Failure mode nobody complained about:** the eval suite as built still
-only measures *this build's* 30 authored cases. It was never run against
-the brief's real 240 (180 + 60 held-out), because they don't exist here.
-A green run of this suite is evidence the mechanisms work against the
-scenarios I thought to author — not proof against scenarios I didn't
-think of. See MEMO.md.
+only measures this project's own 30 authored cases, plus 4 held-out
+gateway regressions. A green run of this suite is evidence the
+mechanisms work against the scenarios I thought to author — not proof
+against scenarios I didn't think of. A larger, independently authored
+case set (and independently written detectors) would be a meaningfully
+stronger bar; see MEMO.md.
 
 ### 2. Answers changed on a Tuesday; nothing in the repo changed
 

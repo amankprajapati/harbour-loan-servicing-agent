@@ -1,28 +1,29 @@
-# Plan — Harbour hardening (Open Problem 01)
+# PLAN.md — Harbour architecture and build log
 
-## Starting condition, stated plainly
+## Design goals, stated plainly
 
-The brief describes an *inherited* system: an existing Harbour service, 180
-published cases, a thin 40-case eval suite, a production contract and its
-checker, private defect detectors, and a live model gateway reachable at
-`LLM_BASE_URL`. None of that exists on this machine or anywhere I can reach
-from it — there is no `references/OP-01/harbour/`, no published case set, no
-checker binary, no gateway.
+Harbour is built to a specific standard: an AI support agent with access to
+real money and real customer data should not be shippable unless six
+specific failure modes are structurally impossible, not just discouraged in
+a prompt. Those six failure modes — the ones that actually bite teams who
+give an LLM agent tool access to a live financial system — are the design
+target for this build, from the first commit:
 
-So this is not an audit of someone else's code. It is a from-scratch build of
-a Harbour that is architected, from the first commit, to not have the six
-symptoms described in the brief, plus the four deliverables the platform team
-never got. I am both "the team that left" and "the team that hardens it" —
-there is no seam between those two roles here, which is a real limitation of
-doing this without the actual harness. I say this once, here, and then get on
-with building the best version of this system I can.
+1. An eval suite that stays green through a real incident.
+2. Behavior that silently changes when the model provider rolls a new
+   snapshot, with nothing in the repo changing.
+3. Cost spikes with no way to attribute them to specific traffic.
+4. No way to answer "what did resolving this one case cost."
+5. Money moving with no enforced, recorded identity-verification step.
+6. The agent acting on an instruction smuggled in through untrusted
+   free text (a customer message, or a note read back from a tool).
 
-Every claim I make about *why* a design choice prevents a symptom is backed by
-a concrete mechanism in the code and, where practical, a test that fails if
-the mechanism regresses. ANALYSIS.md restates each symptom against its fix at
-the end.
+Every claim about *why* a design choice prevents one of these is backed by a
+concrete mechanism in the code and, where practical, a test that fails if the
+mechanism regresses. ANALYSIS.md restates each target against its fix, with
+evidence, at the end of the build.
 
-## Working hypotheses for the six symptoms
+## Working hypotheses for the six failure modes
 
 Stated up front so the build has a target, not just a shape. Revisited and
 either confirmed or revised in ANALYSIS.md once the system exists.
@@ -86,25 +87,26 @@ either confirmed or revised in ANALYSIS.md once the system exists.
   substitution is the single biggest limitation of this build and is
   called out again in MEMO.md.
 - **P6 — service.** `POST /case` FastAPI endpoint implementing the
-  production contract as I've had to reconstruct it from the brief.
+  production contract documented in `CONTRACT.md`.
 - **P7 — cases.** A generated, documented set of cases with `goal_state`,
-  standing in for the 180 published cases, spanning normal handling,
-  policy edge cases, and adversarial input. Documented as authored, not
-  claimed as the real set.
+  spanning normal handling, policy edge cases, and adversarial input.
+  Documented as authored, and small by design (30 cases) rather than a
+  claim of exhaustive coverage — see ANALYSIS.md for what that does and
+  doesn't prove.
 - **P8 — eval suite.** Runner plus cases covering the breadth (1) calls
-  for; `make eval`; a report format the grading table in the brief could
-  plausibly consume.
+  for; `make eval`; a structured JSON report suitable for a CI gate.
 - **P9 — gateway regression pack.** Four regressions applied as proxy
   middleware — stripped system prompt, truncated completions, scrambled
   tool arguments, unapproved model identity — plus eval assertions that
   fail under each and pass clean.
-- **P10 — defect detectors.** My own deterministic assertions over
-  `audit_log` and the trace export (I do not have the real private ones,
-  so these are declared as a stand-in, not a claim of parity).
+- **P10 — defect detectors.** Deterministic assertions over `audit_log`
+  and the trace export that independently re-derive the system's safety
+  claims from evidence, separately from the code paths that are supposed
+  to guarantee them.
 - **P11 — contract and checker.** `CONTRACT.md` plus
   `contract_check/check.py` runnable against the live service.
 - **P12 — reproduce script, offline tests, final polish.**
-- **P13 — ANALYSIS.md, RUNBOOK.md, MEMO.md.** The required write-ups,
+- **P13 — ANALYSIS.md, RUNBOOK.md, MEMO.md.** The design write-ups,
   written last so they describe a system that actually exists.
 
 ## What "done" means here

@@ -2,8 +2,8 @@
 """The eval suite runner. `make eval` calls this. Loads
 cases/published/cases.json, runs every case against a fresh seeded
 database, checks the resulting backend state against each case's
-goal_state, and writes results/eval_report.json in a shape the grading
-table in the brief could plausibly consume.
+goal_state, and writes results/eval_report.json as a structured report
+suitable for a CI gate.
 
 Exit code is 0 only if every case passed -- this is what makes `make
 eval` usable as a gate, not just a report generator.

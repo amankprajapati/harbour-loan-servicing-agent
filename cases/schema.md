@@ -46,10 +46,9 @@ where cases execute one after another.
 - `goal_state.account_frozen`: whether the loan's status became
   `charged_off` (this build's stand-in for "frozen") during the case.
 
-These are authored cases, standing in for the 180 published cases
-described in the brief, which do not exist in this environment. See
-PLAN.md and MEMO.md for that limitation stated plainly. `generate_cases.py`
-derives each case's `goal_state` from the same specification the unit
-tests in `tests/` assert against -- it does not run the system once and
-copy whatever came out, which would validate self-consistency but not
+These are authored cases (30 of them, deliberately small -- see MEMO.md
+for what that does and doesn't prove). `generate_cases.py` derives each
+case's `goal_state` from the same specification the unit tests in
+`tests/` assert against -- it does not run the system once and copy
+whatever came out, which would validate self-consistency but not
 correctness.

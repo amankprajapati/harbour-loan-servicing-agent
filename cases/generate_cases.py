@@ -7,12 +7,12 @@ specification the unit tests in tests/ assert against -- amounts, limits,
 and which tools are gated -- not recorded by running the system once and
 copying its output. See cases/schema.md.
 
-This stands in for the 180 published cases described in the brief, which
-do not exist in this environment. 34 cases, spanning: normal handling
-across every intent, policy edge cases (over-limit refund, failed
-verification), and the two adversarial scenarios (prompt injection via a
-servicing note, with and without the agent legitimately reading that
-note along the way).
+30 cases, deliberately small and hand-authored rather than mined from
+production traffic (see MEMO.md for what that trade-off does and
+doesn't prove), spanning: normal handling across every intent, policy
+edge cases (over-limit refund, failed verification), and the two
+adversarial scenarios (prompt injection via a servicing note, with and
+without the agent legitimately reading that note along the way).
 """
 
 from __future__ import annotations

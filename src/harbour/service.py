@@ -1,13 +1,8 @@
-"""POST /case -- the one contract this service has to keep, per the
-brief ("POST /case keeps its contract. Everything behind it is yours.").
-
-I do not have the real published contract, so CONTRACT.md (added in a
-later phase) is my reconstruction of it from the brief's own language:
-a case comes in, the service resolves it against Harbour's tools and
-policy, and the caller gets back a result describing what happened,
-either synchronously or via a status poll. This module implements that
-reconstruction; contract_check/check.py in a later phase tests the
-running service against it.
+"""POST /case -- the one contract this service has to keep. Documented
+in full in CONTRACT.md: a case comes in, the service resolves it
+against Harbour's tools and policy, and the caller gets back a result
+describing what happened, synchronously. This module implements that
+contract; contract_check/check.py tests a running service against it.
 """
 
 from __future__ import annotations

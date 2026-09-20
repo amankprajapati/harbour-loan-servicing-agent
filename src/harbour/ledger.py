@@ -65,9 +65,9 @@ def read_ledger(export_path: str | Path) -> list[dict[str, Any]]:
 
 def cost_summary_by_case(export_path: str | Path) -> dict[str, dict[str, float]]:
     """Return {case_id: {"tokens_in": n, "tokens_out": n, "cost_usd": n, "calls": n}}.
-    This is the function that answers "what did resolving this case
-    cost" and "what's the median/worst case cost across a run" -- the two
-    questions the brief says the team spent a day guessing at.
+    This is the function that turns "what did resolving this case cost"
+    and "what's the median/worst-case cost across a run" into a query
+    instead of a day of grepping logs.
     """
     summary: dict[str, dict[str, float]] = {}
     for entry in read_ledger(export_path):
