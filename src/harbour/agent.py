@@ -102,8 +102,17 @@ def handle_case(
     )
     conn.commit()
 
+    # `result.steps` and `history` are deliberately the same list object,
+    # not copies kept in sync by hand: a step recorded via
+    # `history.append(...)` is immediately visible on `result.steps` too,
+    # including on every early-return escalation path below. Keeping two
+    # separate lists was a real bug (caught by manually smoke-testing the
+    # running service, not by a unit test): a case that escalated
+    # mid-step reported `steps_taken: 0` because the failing step was
+    # appended to `history` but the early `return` skipped the separate
+    # `result.steps.append(...)` line.
     history: list[dict[str, Any]] = []
-    result = CaseResult(case_id=case_id, status="in_progress")
+    result = CaseResult(case_id=case_id, status="in_progress", steps=history)
 
     with tracer.span("case", intent=intent):
         for step_index in range(MAX_STEPS):
@@ -195,7 +204,6 @@ def handle_case(
                     return result
 
             conn.commit()
-            result.steps.append(history[-1])
 
             if response.action == "escalate_to_human":
                 result.status, result.final_reason = "escalated", "planner_escalated"

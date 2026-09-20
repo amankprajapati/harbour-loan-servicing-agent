@@ -205,6 +205,25 @@ def test_every_case_produces_trace_spans_and_ledger_entries(seeded_db: sqlite3.C
     assert summary[case_id]["cost_usd"] > 0
 
 
+def test_case_with_no_loan_id_escalates_gracefully_with_accurate_step_count(seeded_db: sqlite3.Connection, tmp_path):
+    """Regression test for a real bug found by smoke-testing the running
+    service: a case with no loan_id (e.g. an inbound message that hasn't
+    been matched to an account yet) makes get_loan fail with a missing
+    argument. The service must not crash and must report the failing
+    step in steps_taken, not silently drop it."""
+    case_id = "CASE-E2E-NO-LOAN"
+    _insert_case(seeded_db, case_id, "what's my balance?")  # no customer_id/loan_id at all
+
+    result = agent_module.handle_case(
+        seeded_db, case_id, trace_path=tmp_path / "otlp.jsonl", ledger_path=tmp_path / "ledger.jsonl"
+    )
+
+    assert result.status == "escalated"
+    assert result.final_reason == "tool_error"
+    assert len(result.steps) == 1  # the failing get_loan attempt is counted, not dropped
+    assert result.steps[0]["outcome"] == "error"
+
+
 def test_step_budget_is_enforced():
     """A planner that never finishes must be escalated at MAX_STEPS, not
     left to loop forever -- this is the direct fix for the cost-cap
